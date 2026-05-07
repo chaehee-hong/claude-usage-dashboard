@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Code · 사용량 대시보드</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --purple: #bc8cff;
+      --orange: #ffa657;
+      --red: #f85149;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    header h1 { font-size: 17px; font-weight: 600; }
+    header h1 span { color: var(--accent); }
+    #meta { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.6; }
+
+    main { max-width: 1300px; margin: 0 auto; padding: 24px; }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin: 28px 0 12px;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* ── Cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+    .card-value { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+    .card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Charts ── */
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+      gap: 12px;
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .chart-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+    .chart-wrap { position: relative; height: 200px; }
+
+    /* ── Table ── */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .table-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { color: var(--muted); font-weight: 500; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 7px 10px; border-bottom: 1px solid rgba(48,54,61,.5); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.025); }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      background: rgba(88,166,255,.12);
+      color: var(--accent);
+    }
+    .badge.sub { background: rgba(188,140,255,.12); color: var(--purple); }
+
+    .empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .empty code {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Claude Code · <span>사용량 대시보드</span></h1>
+  <div id="meta">로딩 중…</div>
+</header>
+
+<main id="main">
+  <div class="empty" id="loading">데이터를 불러오는 중…</div>
+</main>
+
+<script>
+const CHART_BASE = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { labels: { color: '#7d8590', boxWidth: 12, font: { size: 11 } } } },
+  scales: {
+    x: { ticks: { color: '#7d8590', maxTicksLimit: 10, font: { size: 11 } }, grid: { color: '#21262d' } },
+    y: { ticks: { color: '#7d8590', font: { size: 11 } }, grid: { color: '#21262d' } },
+  },
+};
+
+const NO_SCALE = { plugins: CHART_BASE.plugins, responsive: true, maintainAspectRatio: false };
+
+function num(n, digits = 0) {
+  if (n == null || n === '') return '—';
+  return Number(n).toLocaleString('ko-KR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+}
+
+function usd(n) {
+  if (!n) return '$0.000';
+  return '$' + Number(n).toFixed(4);
+}
+
+function shortDate(iso) {
+  return iso?.slice(5, 10) ?? '—';      // MM-DD
+}
+
+function shortTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function card(label, value, sub, color) {
+  return `<div class="card">
+    <div class="card-label">${label}</div>
+    <div class="card-value" style="color:${color}">${value}</div>
+    ${sub ? `<div class="card-sub">${sub}</div>` : ''}
+  </div>`;
+}
+
+function makeChart(id, type, labels, datasets, extra = {}) {
+  const ctx = document.getElementById(id)?.getContext('2d');
+  if (!ctx) return;
+  return new Chart(ctx, { type, data: { labels, datasets }, options: { ...CHART_BASE, ...extra } });
+}
+
+function render(data) {
+  const main = document.getElementById('main');
+  const days = Object.keys(data.daily || {}).sort();
+  const today = days.at(-1);
+  const todayData = today ? data.daily[today] : {};
+  const events = (data.recent_events || []).slice().reverse();
+  const byModel = data.by_model || {};
+
+  const tokensToday = (todayData.tokens_input || 0) + (todayData.tokens_output || 0);
+  const totalTokens = days.reduce((s, d) => s + (data.daily[d].tokens_input || 0) + (data.daily[d].tokens_output || 0), 0);
+  const totalCost = days.reduce((s, d) => s + (data.daily[d].cost_usd || 0), 0);
+
+  // ── Today's total cost from events (more accurate) ──
+  const todayStr = today;
+  const eventsToday = events.filter(e => e.timestamp?.startsWith(todayStr));
+  const costToday = eventsToday.reduce((s, e) => s + (e.cost_usd || 0), 0);
+
+  main.innerHTML = `
+    <p class="section-title">오늘 (${today ?? '—'})</p>
+    <div class="cards">
+      ${card('토큰 (입력)', num(todayData.tokens_input), '오늘', 'var(--accent)')}
+      ${card('토큰 (출력)', num(todayData.tokens_output), '오늘', 'var(--purple)')}
+      ${card('캐시 읽기', num(todayData.tokens_cache_read), '오늘', 'var(--muted)')}
+      ${card('비용', usd(costToday || todayData.cost_usd), '오늘 (USD)', 'var(--yellow)')}
+      ${card('세션', num(todayData.sessions), '오늘', 'var(--green)')}
+      ${card('커밋', num(todayData.commits), '오늘', 'var(--orange)')}
+    </div>
+
+    <p class="section-title">전체 누적</p>
+    <div class="cards">
+      ${card('총 토큰', num(totalTokens), `${days.length}일간`, 'var(--accent)')}
+      ${card('총 비용', usd(totalCost), '누적 (USD)', 'var(--yellow)')}
+      ${card('총 코드 추가', num(days.reduce((s,d)=>s+(data.daily[d].lines_added||0),0)), '줄', 'var(--green)')}
+      ${card('총 코드 삭제', num(days.reduce((s,d)=>s+(data.daily[d].lines_removed||0),0)), '줄', 'var(--red)')}
+    </div>
+
+    <p class="section-title">추세</p>
+    <div class="charts">
+      <div class="chart-card">
+        <div class="chart-title">일별 토큰 사용량</div>
+        <div class="chart-wrap"><canvas id="chart-tokens"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">일별 비용 (USD)</div>
+        <div class="chart-wrap"><canvas id="chart-cost"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">모델별 토큰 (전체)</div>
+        <div class="chart-wrap"><canvas id="chart-model"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">API 요청 응답 시간 (최근 50건)</div>
+        <div class="chart-wrap"><canvas id="chart-latency"></canvas></div>
+      </div>
+    </div>
+
+    <p class="section-title">최근 API 호출</p>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>시각</th>
+            <th>모델</th>
+            <th>출처</th>
+            <th>입력 토큰</th>
+            <th>출력 토큰</th>
+            <th>캐시 읽기</th>
+            <th>비용</th>
+            <th>응답 시간</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${events.slice(0, 50).map(e => `<tr>
+            <td>${shortTime(e.timestamp)}</td>
+            <td>${e.model?.replace('claude-', '').replace(/-\d{8}$/, '') ?? '—'}</td>
+            <td>${e.query_source === 'subagent' ? '<span class="badge sub">subagent</span>' : '<span class="badge">main</span>'}</td>
+            <td>${num(e.input_tokens)}</td>
+            <td>${num(e.output_tokens)}</td>
+            <td>${num(e.cache_read_tokens)}</td>
+            <td>${usd(e.cost_usd)}</td>
+            <td>${e.duration_ms ? num(e.duration_ms) + 'ms' : '—'}</td>
+          </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">아직 이벤트가 없습니다</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // 날짜 라벨 (최근 30일만 표시)
+  const recentDays = days.slice(-30);
+  const labels = recentDays.map(shortDate);
+
+  makeChart('chart-tokens', 'line', labels, [
+    {
+      label: '입력',
+      data: recentDays.map(d => data.daily[d].tokens_input || 0),
+      borderColor: '#58a6ff', backgroundColor: 'rgba(88,166,255,.08)',
+      fill: true, tension: 0.3, pointRadius: 2,
+    },
+    {
+      label: '출력',
+      data: recentDays.map(d => data.daily[d].tokens_output || 0),
+      borderColor: '#bc8cff', backgroundColor: 'rgba(188,140,255,.08)',
+      fill: true, tension: 0.3, pointRadius: 2,
+    },
+    {
+      label: '캐시',
+      data: recentDays.map(d => (data.daily[d].tokens_cache_read || 0)),
+      borderColor: '#7d8590', tension: 0.3, pointRadius: 2,
+    },
+  ]);
+
+  makeChart('chart-cost', 'bar', labels, [
+    {
+      label: '비용 (USD)',
+      data: recentDays.map(d => +(data.daily[d].cost_usd || 0).toFixed(5)),
+      backgroundColor: 'rgba(210,153,34,.65)',
+      borderRadius: 4,
+    },
+  ]);
+
+  // Model donut
+  const modelNames = Object.keys(byModel);
+  const COLORS = ['#58a6ff','#bc8cff','#3fb950','#ffa657','#d29922','#f85149'];
+  const modelCtx = document.getElementById('chart-model')?.getContext('2d');
+  if (modelCtx && modelNames.length) {
+    new Chart(modelCtx, {
+      type: 'doughnut',
+      data: {
+        labels: modelNames.map(n => n.replace('claude-', '').replace(/-\d{8}$/, '')),
+        datasets: [{
+          data: modelNames.map(n => (byModel[n].tokens_input || 0) + (byModel[n].tokens_output || 0)),
+          backgroundColor: COLORS,
+          borderColor: '#161b22',
+          borderWidth: 3,
+        }],
+      },
+      options: { ...NO_SCALE, plugins: { legend: { position: 'right', labels: { color: '#7d8590', font: { size: 11 } } } } },
+    });
+  } else if (modelCtx) {
+    modelCtx.canvas.parentElement.innerHTML = '<div class="empty" style="padding:60px">데이터 없음</div>';
+  }
+
+  // Latency scatter
+  const recent50 = events.slice(0, 50).reverse();
+  makeChart('chart-latency', 'bar', recent50.map((_, i) => i + 1), [
+    {
+      label: '응답 시간 (ms)',
+      data: recent50.map(e => e.duration_ms || 0),
+      backgroundColor: 'rgba(63,185,80,.6)',
+      borderRadius: 3,
+    },
+  ]);
+
+  // Update meta
+  const lastEvent = events[0];
+  document.getElementById('meta').innerHTML =
+    `마지막 업데이트: ${lastEvent ? shortTime(lastEvent.timestamp) : '—'}<br>` +
+    `총 ${days.length}일 · ${num(events.length)}건의 API 요청`;
+}
+
+async function load() {
+  try {
+    const res = await fetch('data.json?' + Date.now());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    const hasDays = Object.keys(data.daily || {}).length > 0;
+    if (!hasDays && !(data.recent_events || []).length) {
+      document.getElementById('main').innerHTML = `
+        <div class="empty">
+          <div>아직 데이터가 없습니다.</div>
+          <div style="margin-top:8px;font-size:12px">collector 서버를 실행하고 Claude Code를 사용하면 자동으로 수집됩니다.</div>
+          <code>python3 collector/server.py &amp;</code>
+        </div>`;
+      document.getElementById('meta').textContent = '데이터 없음';
+      return;
+    }
+
+    render(data);
+  } catch (e) {
+    document.getElementById('main').innerHTML =
+      `<div class="empty">data.json 로드 실패: ${e.message}<br><br>
+       <code>python3 collector/sync.py</code> 를 실행해 데이터를 동기화하세요.</div>`;
+    document.getElementById('meta').textContent = '로드 실패';
+  }
+}
+
+load();
+// 5분마다 자동 갱신
+setInterval(load, 5 * 60 * 1000);
+</script>
+</body>
+</html>
