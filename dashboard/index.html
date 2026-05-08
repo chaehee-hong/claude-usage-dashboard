@@ -202,32 +202,37 @@ function render(data) {
   const events = (data.recent_events || []).slice().reverse();
   const byModel = data.by_model || {};
 
-  const tokensToday = (todayData.tokens_input || 0) + (todayData.tokens_output || 0);
-  const totalTokens = days.reduce((s, d) => s + (data.daily[d].tokens_input || 0) + (data.daily[d].tokens_output || 0), 0);
-  const totalCost = days.reduce((s, d) => s + (data.daily[d].cost_usd || 0), 0);
+  const totalOf = (key) => days.reduce((s, d) => s + (data.daily[d][key] || 0), 0);
+  const totalCost = totalOf('cost_usd');
 
-  // ── Today's total cost from events (more accurate) ──
-  const todayStr = today;
-  const eventsToday = events.filter(e => e.timestamp?.startsWith(todayStr));
-  const costToday = eventsToday.reduce((s, e) => s + (e.cost_usd || 0), 0);
+  // 실제 처리 토큰 = 입력 + 출력 + 캐시읽기 + 캐시쓰기
+  const realTotal = (v) =>
+    (v.tokens_input || 0) + (v.tokens_output || 0) +
+    (v.tokens_cache_read || 0) + (v.tokens_cache_creation || 0);
+
+  const todayCost = todayData.cost_usd || 0;
+  const todayReal = realTotal(todayData);
+  const grandReal = days.reduce((s, d) => s + realTotal(data.daily[d]), 0);
 
   main.innerHTML = `
-    <p class="section-title">오늘 (${today ?? '—'})</p>
+    <p class="section-title">오늘 (${today ?? '—'}) — 실제 처리 ${num(todayReal)} 토큰</p>
     <div class="cards">
-      ${card('토큰 (입력)', num(todayData.tokens_input), '오늘', 'var(--accent)')}
-      ${card('토큰 (출력)', num(todayData.tokens_output), '오늘', 'var(--purple)')}
-      ${card('캐시 읽기', num(todayData.tokens_cache_read), '오늘', 'var(--muted)')}
-      ${card('비용', usd(costToday || todayData.cost_usd), '오늘 (USD)', 'var(--yellow)')}
-      ${card('세션', num(todayData.sessions), '오늘', 'var(--green)')}
-      ${card('커밋', num(todayData.commits), '오늘', 'var(--orange)')}
+      ${card('입력',      num(todayData.tokens_input),            '새로 처리',  'var(--accent)')}
+      ${card('출력',      num(todayData.tokens_output),           '생성',       'var(--purple)')}
+      ${card('캐시 읽기', num(todayData.tokens_cache_read),       '컨텍스트',   'var(--muted)')}
+      ${card('캐시 쓰기', num(todayData.tokens_cache_creation),   '캐싱',       '#4d9375')}
+      ${card('비용',      usd(todayCost),                         '오늘 (USD)', 'var(--yellow)')}
+      ${card('세션',      num(todayData.sessions),                '오늘',       'var(--green)')}
     </div>
 
-    <p class="section-title">전체 누적</p>
+    <p class="section-title">전체 누적 — 실제 처리 ${num(grandReal)} 토큰</p>
     <div class="cards">
-      ${card('총 토큰', num(totalTokens), `${days.length}일간`, 'var(--accent)')}
-      ${card('총 비용', usd(totalCost), '누적 (USD)', 'var(--yellow)')}
-      ${card('총 코드 추가', num(days.reduce((s,d)=>s+(data.daily[d].lines_added||0),0)), '줄', 'var(--green)')}
-      ${card('총 코드 삭제', num(days.reduce((s,d)=>s+(data.daily[d].lines_removed||0),0)), '줄', 'var(--red)')}
+      ${card('입력 누적',      num(totalOf('tokens_input')),          `${days.length}일간`, 'var(--accent)')}
+      ${card('출력 누적',      num(totalOf('tokens_output')),         `${days.length}일간`, 'var(--purple)')}
+      ${card('캐시 읽기 누적', num(totalOf('tokens_cache_read')),     `${days.length}일간`, 'var(--muted)')}
+      ${card('캐시 쓰기 누적', num(totalOf('tokens_cache_creation')), `${days.length}일간`, '#4d9375')}
+      ${card('총 비용',        usd(totalCost),                        '누적 (USD)',          'var(--yellow)')}
+      ${card('총 세션',        num(totalOf('sessions')),              `${days.length}일간`, 'var(--green)')}
     </div>
 
     <p class="section-title">추세</p>
@@ -258,24 +263,29 @@ function render(data) {
             <th>시각</th>
             <th>모델</th>
             <th>출처</th>
-            <th>입력 토큰</th>
-            <th>출력 토큰</th>
+            <th>입력</th>
+            <th>출력</th>
             <th>캐시 읽기</th>
+            <th>캐시 쓰기</th>
+            <th>실제 처리</th>
             <th>비용</th>
-            <th>응답 시간</th>
           </tr>
         </thead>
         <tbody>
-          ${events.slice(0, 50).map(e => `<tr>
+          ${events.slice(0, 50).map(e => {
+            const real = (e.input_tokens||0)+(e.output_tokens||0)+(e.cache_read_tokens||0)+(e.cache_creation_tokens||0);
+            return `<tr>
             <td>${shortTime(e.timestamp)}</td>
             <td>${e.model?.replace('claude-', '').replace(/-\d{8}$/, '') ?? '—'}</td>
             <td>${e.query_source === 'subagent' ? '<span class="badge sub">subagent</span>' : '<span class="badge">main</span>'}</td>
             <td>${num(e.input_tokens)}</td>
             <td>${num(e.output_tokens)}</td>
             <td>${num(e.cache_read_tokens)}</td>
+            <td>${num(e.cache_creation_tokens)}</td>
+            <td style="color:var(--accent)">${num(real)}</td>
             <td>${usd(e.cost_usd)}</td>
-            <td>${e.duration_ms ? num(e.duration_ms) + 'ms' : '—'}</td>
-          </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">아직 이벤트가 없습니다</td></tr>'}
+          </tr>`;
+          }).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">아직 이벤트가 없습니다</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -287,9 +297,9 @@ function render(data) {
 
   makeChart('chart-tokens', 'line', labels, [
     {
-      label: '입력',
-      data: recentDays.map(d => data.daily[d].tokens_input || 0),
-      borderColor: '#58a6ff', backgroundColor: 'rgba(88,166,255,.08)',
+      label: '캐시 읽기',
+      data: recentDays.map(d => data.daily[d].tokens_cache_read || 0),
+      borderColor: '#7d8590', backgroundColor: 'rgba(125,133,144,.06)',
       fill: true, tension: 0.3, pointRadius: 2,
     },
     {
@@ -299,9 +309,14 @@ function render(data) {
       fill: true, tension: 0.3, pointRadius: 2,
     },
     {
-      label: '캐시',
-      data: recentDays.map(d => (data.daily[d].tokens_cache_read || 0)),
-      borderColor: '#7d8590', tension: 0.3, pointRadius: 2,
+      label: '캐시 쓰기',
+      data: recentDays.map(d => data.daily[d].tokens_cache_creation || 0),
+      borderColor: '#4d9375', tension: 0.3, pointRadius: 2,
+    },
+    {
+      label: '입력',
+      data: recentDays.map(d => data.daily[d].tokens_input || 0),
+      borderColor: '#58a6ff', tension: 0.3, pointRadius: 2,
     },
   ]);
 
