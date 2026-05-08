@@ -1,5 +1,17 @@
 {
-  "daily": {},
+  "daily": {
+    "2026-05-07": {
+      "tokens_input": 0,
+      "tokens_output": 0,
+      "tokens_cache_read": 0,
+      "tokens_cache_creation": 0,
+      "cost_usd": 0.0,
+      "sessions": 0,
+      "commits": 0,
+      "lines_added": 0,
+      "lines_removed": 0
+    }
+  },
   "by_model": {},
   "recent_events": []
 }
