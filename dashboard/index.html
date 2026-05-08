@@ -371,7 +371,7 @@ function render(data) {
 
 async function load() {
   try {
-    const res = await fetch('data.json?' + Date.now());
+    const res = await fetch('https://raw.githubusercontent.com/chaehee-hong/claude-usage-dashboard/main/dashboard/data.json?' + Date.now());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
