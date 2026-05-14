@@ -155,11 +155,11 @@
       "lines_removed": 0
     },
     "2026-05-14": {
-      "tokens_input": 58,
-      "tokens_output": 29130,
-      "tokens_cache_read": 3404925,
-      "tokens_cache_creation": 111582,
-      "cost_usd": 9.385171,
+      "tokens_input": 84,
+      "tokens_output": 35752,
+      "tokens_cache_read": 4756276,
+      "tokens_cache_creation": 234826,
+      "cost_usd": 14.220062,
       "sessions": 0,
       "commits": 0,
       "lines_added": 0,
@@ -182,135 +182,14 @@
       "cost_usd": 0.0
     },
     "claude-opus-4-7": {
-      "tokens_input": 3854,
-      "tokens_output": 1912012,
-      "tokens_cache_read": 844261680,
-      "tokens_cache_creation": 8026308,
-      "cost_usd": 1560.344497
+      "tokens_input": 3880,
+      "tokens_output": 1918634,
+      "tokens_cache_read": 845613031,
+      "tokens_cache_creation": 8149552,
+      "cost_usd": 1565.179376
     }
   },
   "recent_events": [
-    {
-      "timestamp": "2026-05-13T02:24:21.384Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.444,
-      "input_tokens": 1,
-      "output_tokens": 1178,
-      "cache_read_tokens": 115790,
-      "cache_creation_tokens": 9704,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:24:27.023Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.237362,
-      "input_tokens": 1,
-      "output_tokens": 142,
-      "cache_read_tokens": 125494,
-      "cache_creation_tokens": 2051,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:24:35.198Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.293445,
-      "input_tokens": 1,
-      "output_tokens": 590,
-      "cache_read_tokens": 127545,
-      "cache_creation_tokens": 3086,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:25:03.622Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.376618,
-      "input_tokens": 1,
-      "output_tokens": 2194,
-      "cache_read_tokens": 130631,
-      "cache_creation_tokens": 859,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:25:11.239Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.292425,
-      "input_tokens": 1,
-      "output_tokens": 528,
-      "cache_read_tokens": 131490,
-      "cache_creation_tokens": 2964,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:25:21.171Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.267415,
-      "input_tokens": 1,
-      "output_tokens": 710,
-      "cache_read_tokens": 134454,
-      "cache_creation_tokens": 665,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:25:38.128Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.432456,
-      "input_tokens": 1,
-      "output_tokens": 2862,
-      "cache_read_tokens": 135119,
-      "cache_creation_tokens": 806,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:30:35.696Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.316515,
-      "input_tokens": 6,
-      "output_tokens": 781,
-      "cache_read_tokens": 135925,
-      "cache_creation_tokens": 2878,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:30:44.405Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.410513,
-      "input_tokens": 1,
-      "output_tokens": 598,
-      "cache_read_tokens": 138803,
-      "cache_creation_tokens": 8397,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:30:52.650Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.266827,
-      "input_tokens": 1,
-      "output_tokens": 114,
-      "cache_read_tokens": 147200,
-      "cache_creation_tokens": 1998,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-05-13T02:30:56.260Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.258743,
-      "input_tokens": 1,
-      "output_tokens": 230,
-      "cache_read_tokens": 149198,
-      "cache_creation_tokens": 943,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
     {
       "timestamp": "2026-05-13T02:31:07.670Z",
       "model": "claude-opus-4-7",
@@ -3487,6 +3366,127 @@
       "output_tokens": 249,
       "cache_read_tokens": 126275,
       "cache_creation_tokens": 462,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:45:37.474Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 2.13658,
+      "input_tokens": 6,
+      "output_tokens": 210,
+      "cache_read_tokens": 15027,
+      "cache_creation_tokens": 111904,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:45:41.707Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.22823,
+      "input_tokens": 1,
+      "output_tokens": 143,
+      "cache_read_tokens": 126931,
+      "cache_creation_tokens": 1445,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:46:04.848Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.476435,
+      "input_tokens": 1,
+      "output_tokens": 3385,
+      "cache_read_tokens": 128376,
+      "cache_creation_tokens": 1599,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:53:28.280Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.356921,
+      "input_tokens": 6,
+      "output_tokens": 1308,
+      "cache_read_tokens": 129975,
+      "cache_creation_tokens": 3401,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:59:37.113Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.239154,
+      "input_tokens": 6,
+      "output_tokens": 175,
+      "cache_read_tokens": 133376,
+      "cache_creation_tokens": 1380,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:59:41.451Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.224049,
+      "input_tokens": 1,
+      "output_tokens": 143,
+      "cache_read_tokens": 134756,
+      "cache_creation_tokens": 596,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:59:45.604Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.225674,
+      "input_tokens": 1,
+      "output_tokens": 180,
+      "cache_read_tokens": 135352,
+      "cache_creation_tokens": 487,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:59:48.833Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.228505,
+      "input_tokens": 1,
+      "output_tokens": 142,
+      "cache_read_tokens": 135839,
+      "cache_creation_tokens": 751,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T03:59:55.810Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.253312,
+      "input_tokens": 1,
+      "output_tokens": 470,
+      "cache_read_tokens": 136590,
+      "cache_creation_tokens": 702,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T04:00:06.441Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.240622,
+      "input_tokens": 1,
+      "output_tokens": 326,
+      "cache_read_tokens": 137292,
+      "cache_creation_tokens": 545,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-05-14T04:00:13.876Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 0.225408,
+      "input_tokens": 1,
+      "output_tokens": 140,
+      "cache_read_tokens": 137837,
+      "cache_creation_tokens": 434,
       "duration_ms": 0,
       "query_source": "main"
     }
