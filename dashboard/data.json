@@ -153,15 +153,26 @@
       "commits": 0,
       "lines_added": 0,
       "lines_removed": 0
+    },
+    "2026-06-18": {
+      "tokens_input": 7,
+      "tokens_output": 218,
+      "tokens_cache_read": 801197,
+      "tokens_cache_creation": 769792,
+      "cost_usd": 15.651851,
+      "sessions": 0,
+      "commits": 0,
+      "lines_added": 0,
+      "lines_removed": 0
     }
   },
   "by_model": {
     "claude-opus-4-7": {
-      "tokens_input": 6441,
-      "tokens_output": 2852382,
-      "tokens_cache_read": 1968072842,
-      "tokens_cache_creation": 17760688,
-      "cost_usd": 3499.147446
+      "tokens_input": 6448,
+      "tokens_output": 2852600,
+      "tokens_cache_read": 1968874039,
+      "tokens_cache_creation": 18530480,
+      "cost_usd": 3514.799294
     },
     "claude-opus-4-8": {
       "tokens_input": 5137,
@@ -179,28 +190,6 @@
     }
   },
   "recent_events": [
-    {
-      "timestamp": "2026-06-16T06:07:59.116Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.823956,
-      "input_tokens": 1,
-      "output_tokens": 182,
-      "cache_read_tokens": 516644,
-      "cache_creation_tokens": 1884,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
-    {
-      "timestamp": "2026-06-16T06:08:09.367Z",
-      "model": "claude-opus-4-7",
-      "cost_usd": 0.843507,
-      "input_tokens": 1,
-      "output_tokens": 667,
-      "cache_read_tokens": 518528,
-      "cache_creation_tokens": 836,
-      "duration_ms": 0,
-      "query_source": "main"
-    },
     {
       "timestamp": "2026-06-16T06:08:40.656Z",
       "model": "claude-opus-4-7",
@@ -3476,6 +3465,28 @@
       "output_tokens": 1852,
       "cache_read_tokens": 781613,
       "cache_creation_tokens": 1589,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-06-18T02:02:24.386Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 14.463223,
+      "input_tokens": 6,
+      "output_tokens": 187,
+      "cache_read_tokens": 15926,
+      "cache_creation_tokens": 769345,
+      "duration_ms": 0,
+      "query_source": "main"
+    },
+    {
+      "timestamp": "2026-06-18T02:02:32.066Z",
+      "model": "claude-opus-4-7",
+      "cost_usd": 1.188628,
+      "input_tokens": 1,
+      "output_tokens": 31,
+      "cache_read_tokens": 785271,
+      "cache_creation_tokens": 447,
       "duration_ms": 0,
       "query_source": "main"
     }
